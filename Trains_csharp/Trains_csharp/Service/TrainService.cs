@@ -33,6 +33,7 @@ namespace Trains_csharp
         public RouteResponse GetShortestRoute(string from, string to)
         {
             InitializeTables();
+            RearrangeCityStack(from);
 
             do
             {
@@ -66,6 +67,12 @@ namespace Trains_csharp
                 //Cities.Add(t.Value);
             }
             
+        }
+
+        private void RearrangeCityStack(string city)
+        {
+            Cities.Remove(city);
+            Cities.Insert(0, city);
         }
         
         private List<Neighbor> GetNeighbors(string city)
