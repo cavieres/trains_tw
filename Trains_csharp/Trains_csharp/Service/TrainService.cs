@@ -33,7 +33,9 @@ namespace Trains_csharp
         public RouteResponse GetShortestRoute(string from, string to)
         {
             InitializeTables();
-            RearrangeCityStack(from);
+            MoveCityToTopStack(from);
+
+            Dictionary<string, int?> nextCity;
 
             do
             {
@@ -51,7 +53,16 @@ namespace Trains_csharp
                         
                 }
 
-            } while (Cities.Count != 0);
+                nextCity = Distances
+                        .Where(c => c.Value != null && Cities.Contains(c.Key))
+                        .OrderBy(c => c.Value).ToDictionary(d => d.Key, d => d.Value);
+
+                if (nextCity.Count != 0)
+                    MoveCityToTopStack(Distances
+                        .Where(c => c.Value != null && Cities.Contains(c.Key))
+                        .OrderBy(c => c.Value).First().Key);
+
+            } while (nextCity.Count != 0);
 
             return new RouteResponse {
                 Pregunta = string.Format("The lenght of the shortest route (in terms of distance to travel) from {0} to {1}.", from, to),
@@ -64,13 +75,15 @@ namespace Trains_csharp
             {
                 Distances.Add(t.Value, null);
                 Routes.Add(t.Value, null);
-                //Cities.Add(t.Value);
             }
             
         }
 
-        private void RearrangeCityStack(string city)
+        private void MoveCityToTopStack(string city)
         {
+            if ((Cities.Count == 0) || !Cities.Exists(c => c == city))
+                return;
+
             Cities.Remove(city);
             Cities.Insert(0, city);
         }

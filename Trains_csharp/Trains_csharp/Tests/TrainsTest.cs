@@ -28,7 +28,7 @@ namespace Trains_csharp
         {
             var trainService = new TrainService(GraphInput);
 
-            var result = trainService.GetShortestRoute("B", "D");
+            var result = trainService.GetShortestRoute("B", "B");
 
             Assert.AreEqual("The lenght of the shortest route (in terms of distance to travel) from B to B.", result.Pregunta);
             Assert.AreEqual("9", result.Salida);
