@@ -12,7 +12,7 @@ namespace Trains_csharp
         {
             var graphInput = "AB5, BC4, CD8, DC8, DE6, AD5, CE2, EB3, AE7";
 
-            var trainService = new TrainService(graphInput);
+            var trainService = new ShortestRouteService(graphInput);
 
             var result = trainService.GetShortestRoute("A", "C");
 

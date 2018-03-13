@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Trains_csharp
 {
-    public class TrainService
+    public class ShortestRouteService
     {
         private Dictionary<string, int?> Distances;
         private Dictionary<string, string> Routes;
@@ -15,7 +15,7 @@ namespace Trains_csharp
 
         private Graph<string> TrainsGraph { get; set; }
 
-        public TrainService(string graphInput)
+        public ShortestRouteService(string graphInput)
         {
             Cities = new List<string>();
             Distances = new Dictionary<string, int?>();

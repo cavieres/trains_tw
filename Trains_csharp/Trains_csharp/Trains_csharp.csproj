@@ -55,7 +55,8 @@
     <Compile Include="Program.cs" />
     <Compile Include="Models\RouteResponse.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Service\TrainService.cs" />
+    <Compile Include="Service\DistanceRouteService.cs" />
+    <Compile Include="Service\ShortestRouteService.cs" />
     <Compile Include="Tests\TrainsTest.cs" />
   </ItemGroup>
   <ItemGroup>
