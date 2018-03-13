@@ -11,10 +11,10 @@ namespace Trains_csharp
     {
         class Options
         {
-            [Option('r', "read", Required = true, HelpText = "Input files to be processed.")]
+            [Option('r', "read", Required = true, HelpText = "Input text file with graph as described in problem description.")]
             public string InputFiles { get; set; }
 
-            [Option('q', "question", Required = false, HelpText = "Question")]
+            [Option('q', "question", Required = true, HelpText = "Question (get distance of route, trips between two nodes, shortest route or different routes).")]
             public IEnumerable<string> Question { get; set; }
         }
 
@@ -37,11 +37,17 @@ namespace Trains_csharp
 
                     response = new DistanceRouteService(graphInput).GetRouteDistance(route);
                     break;
-                case "t":
+                case "tmax":
                     var trips = ((string[])opts.Question)[1].ToUpper().Replace(" ", string.Empty).Split(',').ToList();
                     var maxStops = Convert.ToInt16(((string[])opts.Question)[2].ToUpper().Replace(" ", string.Empty));
 
                     response = new NumberOfTripsService(graphInput).GetMaxNumberOfTrips(trips[0], trips[1], maxStops);
+                    break;
+                case "texact":
+                    trips = ((string[])opts.Question)[1].ToUpper().Replace(" ", string.Empty).Split(',').ToList();
+                    var exactStops = Convert.ToInt16(((string[])opts.Question)[2].ToUpper().Replace(" ", string.Empty));
+
+                    response = new NumberOfTripsService(graphInput).GetExactlyNumberOfTrips(trips[0], trips[1], exactStops);
                     break;
                 case "l":
                     route = ((string[])opts.Question)[1].ToUpper().Replace(" ", string.Empty).Split(',').ToList();
