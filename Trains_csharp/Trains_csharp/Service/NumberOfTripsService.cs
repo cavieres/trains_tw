@@ -6,16 +6,18 @@ using System.Threading.Tasks;
 
 namespace Trains_csharp
 {
-    public class DistanceRouteService
+    public class NumberOfTripsService
     {
         private Dictionary<string, int?> Distances;
         private Dictionary<string, string> Routes;
 
         private List<string> Cities;
 
+        private List<string> Route = new List<string>();
+
         private Graph<string> TrainsGraph { get; set; }
 
-        public DistanceRouteService(string graphInput)
+        public NumberOfTripsService(string graphInput)
         {
             Cities = new List<string>();
             Distances = new Dictionary<string, int?>();
@@ -76,27 +78,40 @@ namespace Trains_csharp
                     }).ToList();
         }
 
-        public RouteResponse GetRouteDistance(List<string> route)
+        public RouteResponse GetMaxNumberOfTrips(string from, string to, int maxStops)
         {
-            var distance = 0;
+            throw new NotImplementedException();
 
-                for (int i = 0; i < route.Count - 1; i++)
-                {
-                    var neighbors = GetNeighbors(route[i]);
-                    var nextStop = neighbors.Where(n => n.Value == route[i + 1]).FirstOrDefault();
+            // TODO: Finalize implementation.
+            var response = GetNextStop(from, to, maxStops, 1);
 
-                    if (nextStop != null)
-                        distance += nextStop.Cost;
-                    else
-                        distance = 0;
-                }
+            return new RouteResponse();
 
-            var pregunta = string.Format("The distance of the route {0}", string.Join("-", route.ToArray()));
+        }
 
-            if (distance == 0)
-                return new RouteResponse { Pregunta = pregunta, Salida = "NO SUCH ROUTE" };
-            else
-                return new RouteResponse { Pregunta = pregunta, Salida = distance.ToString() };
+        public RouteResponse GetExactlyNumberOfTrips(string from, string to, int maxStops)
+        {
+            throw new NotImplementedException();
+        }
+
+        private List<string> GetNextStop(string from, string to, int maxStops, int stopsCount)
+        {
+
+
+            //if (stopsCount > maxStops)
+            //    return from;
+
+            var neighbors = GetNeighbors(from);
+
+            foreach (var n in neighbors)
+            {
+                if (stopsCount > maxStops)
+                    break;
+
+                Route.Add(n.Value + "-" + GetNextStop(n.Value, to, maxStops, stopsCount + 1));
+            }
+
+            return Route;
         }
 
     }

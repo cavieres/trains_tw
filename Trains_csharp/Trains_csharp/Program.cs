@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CommandLine;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,59 +9,59 @@ namespace Trains_csharp
 {
     class Program
     {
-        static void Main(string[] args)
+        class Options
         {
-            var graphInput = "AB5, BC4, CD8, DC8, DE6, AD5, CE2, EB3, AE7";
+            [Option('r', "read", Required = true, HelpText = "Input files to be processed.")]
+            public string InputFiles { get; set; }
 
-            var trainService = new ShortestRouteService(graphInput);
-
-            var result = trainService.GetShortestRoute("A", "C");
-
-            Console.WriteLine(string.Format("Item: 1; Pregunta: {0}; Salida: {1}", result.Pregunta, result.Salida));
+            [Option('q', "question", Required = false, HelpText = "Question")]
+            public IEnumerable<string> Question { get; set; }
         }
 
-        private void Main2()
+        static void Main(string[] args)
         {
-            Graph<string> web = new Graph<string>();
+            CommandLine.Parser.Default.ParseArguments<Options>(args)
+                .WithParsed<Options>(opts => RunOptionsAndReturnExitCode(opts))
+                .WithNotParsed<Options>((errs) => HandleParseError(errs));
+        }
 
-            web.AddNode("Privacy.htm");
-            web.AddNode("People.aspx");
-            web.AddNode("About.htm");
-            web.AddNode("Index.htm");
-            web.AddNode("Products.aspx");
-            web.AddNode("Contact.aspx");
+        private static void RunOptionsAndReturnExitCode(Options opts)
+        {
+            var graphInput = System.IO.File.ReadAllText(opts.InputFiles).ToUpper().Replace(" ", string.Empty);
+            RouteResponse response = new RouteResponse();
 
-            web.AddDirectedEdge((GraphNode<string>)web.Nodes[1], (GraphNode<string>)web.Nodes[0], 3); // People -> Privacy
-
-            foreach (GraphNode<string> w in web.Nodes)
+            switch(opts.Question.First())
             {
-                Console.WriteLine("Node: " + w.Value + "; Neighbors: ");
+                case "d":
+                    var route = ((string[])opts.Question)[1].ToUpper().Replace(" ", string.Empty).Split(',').ToList();
 
-                for (int i = 0; i < w.Neighbors.Count; i++)
-                {
-                    Console.WriteLine(w.Neighbors[i].Value + "; Weight: " + w.Costs[i]);
-                }
+                    response = new DistanceRouteService(graphInput).GetRouteDistance(route);
+                    break;
+                case "t":
+                    var trips = ((string[])opts.Question)[1].ToUpper().Replace(" ", string.Empty).Split(',').ToList();
+                    var maxStops = Convert.ToInt16(((string[])opts.Question)[2].ToUpper().Replace(" ", string.Empty));
 
-                Console.WriteLine("\n");
+                    response = new NumberOfTripsService(graphInput).GetMaxNumberOfTrips(trips[0], trips[1], maxStops);
+                    break;
+                case "l":
+                    route = ((string[])opts.Question)[1].ToUpper().Replace(" ", string.Empty).Split(',').ToList();
+
+                    response = new ShortestRouteService(graphInput).GetShortestRoute(route[0], route[1]);
+                    break;
+                case "r":
+                    route = ((string[])opts.Question)[1].ToUpper().Replace(" ", string.Empty).Split(',').ToList();
+                    maxStops = Convert.ToInt16(((string[])opts.Question)[2].ToUpper().Replace(" ", string.Empty));
+
+                    response = new NumberOfDiffRoutesService(graphInput).GetNumberDiffRoutes(route[0], route[1], maxStops);
+                    break;
             }
 
-            Console.ReadKey();
+            Console.WriteLine(string.Format("Pregunta: {0}; Salida: {1}", 
+                response.Pregunta, response.Salida));
+        }
 
-            //web.AddDirectedEdge("People.aspx", "Privacy.htm");  // People -> Privacy
-
-            //web.AddDirectedEdge("Privacy.htm", "Index.htm");    // Privacy -> Index
-            //web.AddDirectedEdge("Privacy.htm", "About.htm");    // Privacy -> About
-
-            //web.AddDirectedEdge("About.htm", "Privacy.htm");    // About -> Privacy
-            //web.AddDirectedEdge("About.htm", "People.aspx");    // About -> People
-            //web.AddDirectedEdge("About.htm", "Contact.aspx");   // About -> Contact
-
-            //web.AddDirectedEdge("Index.htm", "About.htm");      // Index -> About
-            //web.AddDirectedEdge("Index.htm", "Contact.aspx");   // Index -> Contacts
-            //web.AddDirectedEdge("Index.htm", "Products.aspx");  // Index -> Products
-
-            //web.AddDirectedEdge("Products.aspx", "Index.htm");  // Products -> Index
-            //web.AddDirectedEdge("Products.aspx", "People.aspx");// Products -> People
+        private static void HandleParseError(IEnumerable<Error> errs)
+        {
         }
     }
 }
